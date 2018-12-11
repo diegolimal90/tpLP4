@@ -5,7 +5,7 @@ namespace lib;
 class Router{
 	
 	protected $routers = array(
-		'' => 'home',
+		'home' => 'home',
 		'app' => 'app',
 		'contato' => 'app'
 	);

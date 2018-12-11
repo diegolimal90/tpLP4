@@ -1,0 +1,55 @@
+<style>
+    /* Set the size of the div element that contains the map */
+    #map {
+        height: 400px;  /* The height is 400 pixels */
+        width: 100%;  /* The width is the width of the web page */
+    }
+</style>
+<div class="container">
+    <div class="row">
+        <div class="card large">
+            <form action="<?php echo '/'.APP_ROOT;?>/app/contato/novo" method="POST">
+                <div class="card-content">
+                    <span class="card-title">Contato</span>
+                    <div class="row">
+                        <div>
+                            <div style="width:100%;margin-left:41%">
+                                <!-- <img class="circle responsive-img" src="images/office.jpg"> -->
+                                <div style="background-color:green;padding:80px;width:50px;border-radius:100%;"></div>
+                            </div>
+                            <div class="card-content">
+                                <h3 class="center" style="margin: 0px"><?php echo $view_dados->nome; ?></h3>
+                                <div style="margin-top:30px">
+                                    <h6><?php echo $view_dados->telefone; ?></h6>
+                                    <h6><?php echo $view_dados->email; ?></h6>
+                                    <h6 id="end"><?php echo $view_dados->endereco; ?></h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-action">
+                    <div id="map"></div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+      var map;
+      function initMap() {
+        var endereco = document.getElementById('end').textContent;
+        var geo = new google.maps.Geocoder();
+        var result = null;
+        var request = geo.geocode({ 'address': endereco }, function(ret, callbac){
+            console.log(ret);
+        });
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: -34.397, lng: 150.644},
+          zoom: 8
+        });
+      }
+</script> 
+<script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5UlseyJA_L6ZpqhnWHyZvXcokFZKHaAw&callback=initMap">
+</script>

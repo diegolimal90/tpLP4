@@ -1,0 +1,37 @@
+<style>
+    .card {
+            position: relative;
+            left: 25% !important;
+            top: 50% !important;
+    }
+</style>
+<div class="container ">           
+    <div class="row center">
+        <div class="col s12 m12">
+            <div class="card col s12 m6 blue-grey darken-1">
+                <form action="login/logar" method="POST">
+                    <div class="card-content white-text">
+                        <span class="card-title center">Login</span>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <i class="material-icons prefix">account_circle</i>
+                                <input id="email" type="text" name="user" class="validate" value="" required>
+                                <label for="email">E-mail</label>
+                            </div>
+                            <div class="input-field col s12">
+                                <i class="material-icons prefix">vpn_key</i>
+                                <input id="senha" type="password" name="password" class="validate" value="" required>
+                                <label for="senha">Password</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-action right">
+                        <button type="submit" class="waves-effect waves-light btn">
+                            <i class="material-icons right">send</i>Logar
+                        </button>
+                    </div>
+                </form>
+            </div>    
+        </div>
+    </div>
+</div>

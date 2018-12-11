@@ -1,0 +1,26 @@
+<div class="container">
+    <div class="row">
+        <div class="card large">
+            <form action="<?php echo '/'.APP_ROOT;?>/app/contato/saveLote" method="POST" enctype="multipart/form-data">
+                <div class="card-content">
+                    <span class="card-title">Lote de Contatos</span>
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <input id="file" type="file" name="file" class="validate" value="" required placeholder="Arquivo em Lote" />
+                        </div>
+                    </div>
+                </div>
+                <div class="card-action">
+                    <div class="right">
+                        <button type="submit"class="waves-effect waves-light btn">
+                            <i class="material-icons right">save</i>Salvar
+                        </button>
+                        <a href="<?php echo '/'.APP_ROOT;?>/app/contato/" class="waves-effect waves-light btn">
+                            <i class="material-icons right">cancel</i>Cancelar
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

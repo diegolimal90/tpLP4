@@ -2,147 +2,136 @@
 
 namespace lib;
 
-class Model{
+class Model extends Config{
 
-    private $conn;
+    protected $conn;
 
-    public __construct(){
-        $this->setConn( new PDO("mysql:host=localhost;dbname=agenda", "root", ""));
+    public function __construct(){
+        try{
+            $this->conn = new \PDO("mysql:host=". self::srvMyHost .";dbname=". self::srvMyDbname, self::srvMyUser, self::srvMyPass );
+            $this->conn->exec("set names ". self::charset );
+            $this->conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        }catch(\PDOException $ex){
+            die($ex->getMessage());
+        }
     }
 
-    public function getConn(){
-        return $conn;
-    }
     
-    public function setConn($conn){
-        $this->conn = $conn;
-    }
-
-    public function insert($dados){
-        $cont = 0;
-        $sql = "INSERT INTO ";
-        if(is_array($dados)){
-            foreach ($dados as $index => $value) {
-                if($index == "table"){
-                    $sql .= $value . " VALUES (";
-                }else{
-                    if($index == "values" && is_array($value)){
-                        foreach ($dados["values"] as $i => $v) {
-                            if(!empty($i)){
-                                $cont++;
-                                if($cont < sizeof($dados["values"])){
-                                    $sql .= "?, ";
-                                }else{
-                                    $sql .= "?)";
-                                }
-                            }else{
-                                exit("O indice do campo {$v} nao pode estar ser nulo!");
-                            }
-                        }
-                        echo $sql;
-                    }else{
-                        exit("O indice do campo values nao existe e deveconter um array com os campos!");
-                    }                    
-                }
-            }  
-        }else{
-            exit("o array enviado nao se encontra no padrao do framework");
+    /**
+     * metodo para efetuar inserções
+     */
+    public function insert($obj, $table){
+        try{
+            $sql = "INSERT INTO {$table} (". implode(",", array_keys((array) $obj)) .") VALUES ('". implode("','", array_values((array) $obj))."')";
+            $state = $this->conn->prepare($sql);
+            $state->execute(array('widgets'));
+        }catch(\PDOException $ex){
+            die($ex->getMessage() . " " . $sql);
         }
-    }
-    public function select($dados){
-        $cont = 0;
-        $sql = "SELECT ";
-        if(is_array($dados)){
-            foreach ($dados as $index => $value) {
-                if($index == "values" && is_array($value) && !empty($value)){
-                    foreach ($dados["values"] as $i => $v) {
-                        $cont++;
-                        if($cont < sizeof($dados["values"])){
-                            $sql .= "{$v}, ";
-                        }else{
-                            $sql .= "{$v} ";
-                        }
-                    }
-                }
-                if($index == "table"){
-                        $sql .= " FROM " . $value;
-                } 
-                if($index == "relations"){
-                        if(is_array($value)){
-                            foreach ($dados["relations"] as $k => $v) {
-                                switch ($k) {
-                                    case 'inner_join':
-                                        $sql .= " INNER JOIN ";
-                                        foreach ($dados["relations"]['inner_join'] as $ind => $val) {
-                                            if($ind == "table"){
-                                                $sql .= "{$val} ON ";
-                                            }else if($ind == "column"){
-                                                $sql .= "{$val} = ";
-                                            }else if($ind == "key_relation"){
-                                                $sql .= "{$val}";
-                                            }else{
-                                                exit("verificar array de relacionamento!");
-                                            }
-                                        }
-                                        break;
-                                    
-                                    case 'left_join':
-                                        $sql .= " LEFT JOIN ";
-                                        foreach ($dados["relations"]['left_join'] as $ind => $val) {
-                                            if($ind == "table"){
-                                                $sql .= "{$val} ON ";
-                                            }else if($ind == "column"){
-                                                $sql .= "{$val} = ";
-                                            }else if($ind == "key_relation"){
-                                                $sql .= "{$val}";
-                                            }else{
-                                                exit("verificar array de relacionamento!");
-                                            }
-                                        }
-                                        break;
 
-                                    case 'rigth_join':
-                                        $sql .= " RIGTH JOIN ";
-                                        foreach ($dados["relations"]['rigth_join'] as $ind => $val) {
-                                            if($ind == "table"){
-                                                $sql .= "{$val} ON ";
-                                            }else if($ind == "column"){
-                                                $sql .= "{$val} = ";
-                                            }else if($ind == "key_relation"){
-                                                $sql .= "{$val}";
-                                            }else{
-                                                exit("verificar array de relacionamento!");
-                                            }
-                                        }
-                                        break;
-                                    
-                                    default:
-                                        break;
-                                }
-                            }
-                        }
-                    echo $sql;       
-                }
-                if($index == "where"){
-                    if(is_array($value)){
-                        foreach ($dados["where"] as $i => $v) {
-                            # code...
-                        }
-                    }else{
-                        exit("O indice WHERE não esta no padrão do framework!");
-                    }
-                }
-            }                   
+        return array('sucesso'=>true, 'feedback'=>'', 'codigo'=>$this->last($table));
+    }
+
+    /**
+     * metodo para efetuar consultas
+     */
+    public function select($sql){
+        try{
+            $comando = $this->conn->prepare($sql);
+            $comando->execute();
+        }catch(\PDOException $ex){
+            die($ex->getMessage() . " " . $sql);
+        }
+
+        $retorno = array();
+        while ($row = $comando->fetchObject()) {
+            array_push($retorno,$row);
+        }
+        return $retorno;
+    }
+
+    /**
+     * metodo para efetuar Atualizações
+     */
+    public function update($obj, $condicao, $table){
+        try{
+            foreach ($obj as $ind => $val) {
+                $dados[] = "`{$ind}` = " . (is_null($val) ? "NULL " : "'{$val}'");
+            }
+            foreach ($condicao as $ind => $val) {
+                $where[] = "`{$ind}` " . (is_null($val) ? "IS NULL " : " = '{$val}'");
+            }
+
+            $sql= "UPDATE {$table} SET " . implode(',', $dados) . " WHERE " . implode("AND", $where);
+
+            $state = $this->conn->prepare($sql);
+            $state->execute(array('widgets'));
+
+        }catch(\PDOException $ex){
+            die($ex->getMessage() . " " . $sql);
+        }
+
+        return array('sucesso'=>true, 'feedback'=>'');
+    }
+
+    /**
+     * metodo para efetuar exclusoes
+     */
+    public function delete($condicao, $table){
+        try{
+            foreach ($condicao as $ind => $val) {
+                $where[] = " {$ind} " . (is_null($val) ? "IS NULL " : " = {$val} ");
+            }
+
+            $sql= "DELETE FROM {$table} WHERE " . implode("AND", $where);
+
+            $state = $this->conn->prepare($sql);
+            $state->execute(array('widgets'));
+
+        }catch(\PDOException $ex){
+            die($ex->getMessage() . " " . $sql);
+        }
+
+        return array('sucesso'=>true, 'feedback'=>'');
+    }
+
+    /**
+     * metodo para 
+     */
+    public function first($obj){
+        if(isset($obj[0])){
+            return $obj[0];
         }else{
-            exit("o array enviado nao se encontra no padrao do framework");
+            return null;
         }
     }
 
-    public function update($dados){
-        
+    /**
+     * metodo para
+     */
+    public function last($table){
+        try{
+            $sql = $this->conn->prepare("SELECT last_insert_id() AS last FROM {$table}");
+            $sql->execute();
+            $retorno = $sql->fetchObject();
+        }catch(\PDOException $ex){
+            die($ex->getMessage());
+        }
+
+        return $retorno->last;
     }
 
-    public function delete($dados){
-        
+    public function setObject($obj, $values, $existe = true ){;
+        if( is_object($obj)){
+            if(is_object($values)){
+                foreach ($values as $i => $v) {
+                    if(property_exists($obj, $i) || $existe){
+                        $obj->$i = $values->$i;
+                    }
+                }
+            }
+        }
+
+        return $obj;
     }
 }

@@ -1,0 +1,33 @@
+<div class="container">
+<h1>Contatos</h1>
+<table>
+    <tbody>
+    <?php if(sizeof($view_list) > 0): ?>
+        <?php foreach ($view_list as $contato): ?>
+        <tr>
+            <td><?php echo $contato->id;?></td>
+            <td><?php echo $contato->nome;?></td>
+            <td><?php echo $contato->telefone;?></td>
+            <td><?php echo $contato->email;?></td>
+            <td><?php echo $contato->endereco;?></td>
+            <td>
+                <a href="<?php echo '/'.APP_ROOT;?>/app/contato/ver/<?php echo $contato->id;?>" class="btn-floating waves-effect waves-light green">
+                    <i class="material-icons">visibility</i>
+                </a>
+            </td>
+            <td>
+                <a href="<?php echo '/'.APP_ROOT;?>/app/contato/cadContato/<?php echo $contato->id;?>" class="btn-floating waves-effect waves-light orange">
+                    <i class="material-icons">edit</i>
+                </a>
+            </td>
+            <td>
+                <a href="<?php echo '/'.APP_ROOT;?>/app/contato/delete/<?php echo $contato->id;?>" class="btn-floating waves-effect waves-light red">
+                    <i class="material-icons">delete</i>
+                </a>
+            </td>
+        </tr>
+    <?php endforeach ?>
+    <?php endif ?>
+    </tbody>
+</table>
+</div>

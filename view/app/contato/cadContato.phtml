@@ -1,0 +1,36 @@
+<div class="container">
+    <div class="row">
+        <div class="card large">
+            <form action="<?php echo '/'.APP_ROOT;?>/app/contato/novo" method="POST">
+                <div class="card-content">
+                    <span class="card-title">Contato</span>
+                    <div class="row">
+                        <input type="hidden" name="id" value="<?php echo $view_dados->id; ?>" />
+                        <div class="input-field col s12">
+                            <input id="nome" type="text" name="nome" class="validate" value="<?php echo $view_dados->nome; ?>" required placeholder="Nome" />
+                        </div>
+                        <div class="input-field col s12">
+                            <input id="telefone" type="text" name="telefone" class="validate" value="<?php echo $view_dados->telefone; ?>" required  placeholder="Telefone" />
+                        </div>
+                        <div class="input-field col s12">
+                            <input id="email" type="email" name="email" class="validate" value="<?php echo $view_dados->email; ?>" required  placeholder="E-mail" />
+                        </div>
+                        <div class="input-field col s12">
+                            <input id="endereco" type="text" name="endereco" class="validate" value="<?php echo $view_dados->endereco; ?>" required  placeholder="Endereço" />
+                        </div>
+                    </div>
+                </div>
+                <div class="card-action">
+                    <div class="right">
+                        <button type="submit"class="waves-effect waves-light btn">
+                            <i class="material-icons right">save</i>Salvar
+                        </button>
+                        <a href="<?php echo '/'.APP_ROOT;?>/app/contato/" class="waves-effect waves-light btn">
+                            <i class="material-icons right">cancel</i>Cancelar
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

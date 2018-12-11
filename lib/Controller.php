@@ -5,7 +5,8 @@ namespace lib;
 class Controller extends System{
 	
 	public $dados;
-	public $layout;
+	public $layout = '_layout';
+	public $logado = false;
 	
 	private $path;
 	private $pathRender;
